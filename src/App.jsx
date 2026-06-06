@@ -9,14 +9,12 @@ export default function App() {
   const [resultado, setResultado] = useState(null);
   const [tipoMovimiento, setTipoMovimiento] = useState('');
 
-  // Referencias para controlar el desplazamiento de la pantalla
+  // Referencias para controlar el desplazamiento de la pantalla y el reproductor
   const penduloRef = useRef(null);
   const respuestaRef = useRef(null);
-  
-  // Referencia invisible para el control del audio místico
-  const audioRef = useRef(null);
+  const elementoAudioRef = useRef(null);
 
-  // Motor de extracción inteligente para preguntas binarias
+  // Motor de extracción inteligente para preguntas binarias (Abelardo o Cepeda)
   const extraerOpcionesInteligente = (texto) => {
     let limpio = texto.replace(/[¿?¡!.]/g, '');
     if (limpio.includes(':')) {
@@ -41,17 +39,11 @@ export default function App() {
     setResultado(null);
     setTipoMovimiento('');
 
-    // AUDIO UX: Reproducir el sonido del cuenco tibetano al iniciar la oscilación
-    try {
-      if (!audioRef.current) {
-        // Enlace público y ligero a una frecuencia de cuenco tibetano meditativo
-        audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');
-        audioRef.current.volume = 0.6; // Volumen moderado y envolvente
-      }
-      audioRef.current.currentTime = 0; // Reiniciar el sonido desde el segundo cero
-      audioRef.current.play();
-    } catch (error) {
-      console.log("El navegador bloqueó temporalmente el audio hasta interacción.", error);
+    // AUDIO INMERSIVO: Al estar precargado en el navegador, se activa instantáneamente al dar clic
+    if (elementoAudioRef.current) {
+      elementoAudioRef.current.currentTime = 0;
+      elementoAudioRef.current.volume = 0.5; // Volumen sutil y envolvente
+      elementoAudioRef.current.play().catch(err => console.log("Error al reproducir audio:", err));
     }
 
     // Desplazar suavemente hacia el péndulo animado
@@ -59,7 +51,7 @@ export default function App() {
       penduloRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 
-    // Conexión mística (3.5 segundos de oscilación con sonido de ambiente)
+    // Conexión mística (3.5 segundos de oscilación)
     setTimeout(() => {
       const opcionesDetectadas = extraerOpcionesInteligente(pregunta);
       let movimientos = [];
@@ -103,10 +95,9 @@ export default function App() {
       setResultado(azar.dictamen);
       setEstaConsultando(false);
 
-      // AUDIO UX: Detener el sonido sutilmente o dejar que la reverberación se apague
-      // En este caso lo pausamos suavemente para dar paso al silencio del dictamen
-      if (audioRef.current) {
-        audioRef.current.pause();
+      // Pausar el audio cuando el péndulo se detiene a dar la respuesta
+      if (elementoAudioRef.current) {
+        elementoAudioRef.current.pause();
       }
 
       // Desplazar hacia el veredicto final
@@ -126,6 +117,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col items-center justify-start p-4 selection:bg-purple-500">
+      
+      {/* Etiqueta secreta de audio HTML5 precargado con sonido místico de campana/cuenco */}
+      <audio 
+        ref={elementoAudioRef} 
+        src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" 
+        preload="auto"
+      />
+
       {/* Encabezado */}
       <header className="text-center my-8 max-w-xl">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-indigo-500 drop-shadow-lg mb-2">
