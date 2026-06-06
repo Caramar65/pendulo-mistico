@@ -13,6 +13,27 @@ export default function App() {
   const penduloRef = useRef(null);
   const respuestaRef = useRef(null);
 
+  // Función interna para extraer opciones separadas por la letra "o" o "O"
+  const extraerOpciones = (texto) => {
+    // Limpiamos signos de interrogación comunes al final
+    const textoLimpio = texto.replace(/[¿?]/g, '').trim();
+    
+    // Buscamos patrones como "Abelardo o Cepeda" o "A o B" usando expresiones regulares
+    const partes = textoLimpio.split(/\s+[oO]\s+/);
+    
+    if (partes.length >= 2) {
+      // Tomamos la última palabra o frase antes del "o" y la primera después del "o"
+      const opcion1 = partes[partes.length - 2].split(/[:\s]/).pop().trim();
+      const opcion2 = partes[partes.length - 1].trim();
+      
+      // Validamos que no estén vacías y tengan una longitud razonable
+      if (opcion1 && opcion2 && opcion1.length < 30 && opcion2.length < 30) {
+        return [opcion1, opcion2];
+      }
+    }
+    return null;
+  };
+
   const manejarConsulta = (e) => {
     e.preventDefault();
     if (!pregunta.trim() || !nombre.trim() || !signo) return;
@@ -28,25 +49,63 @@ export default function App() {
 
     // Conexión mística (3.5 segundos de oscilación)
     setTimeout(() => {
-      const movimientos = [
-        { 
-          tipo: 'Circular en sentido horario', 
-          dictamen: 'SÍ CLARO Y AFIRMATIVO. Las fuerzas cósmicas indican un camino despejado, lleno de armonía y éxito para tu propósito. Avanza con absoluta confianza.' 
-        },
-        { 
-          tipo: 'Circular en sentido antihorario', 
-          dictamen: 'NO ROTUNDO Y ADVERTENCIA. Existen bloqueos densos o energías en oposición en este camino. El cosmos te sugiere detenerte, proteger tu energía y reevaluar la situación por completo.' 
-        },
-        { 
-          tipo: 'Oscilación Lineal Vertical', 
-          dictamen: 'PROBABLE Y EVOLUTIVO. La puerta está abierta y el flujo energético es favorable, pero el resultado final dependerá estrictamente de tu determinación y de las acciones que tomes hoy.' 
-        },
-        { 
-          tipo: 'Oscilación Lineal Horizontal', 
-          dictamen: 'DUDOSO E INCIERTO. Hay fuerzas en conflicto y confusión en el entorno astral en este momento. El panorama no está claro; la recomendación es serenar la mente y consultar más tarde.' 
-        }
-      ];
+      // Analizamos si la pregunta contiene opciones binarias (Ej: Abelardo o Cepeda)
+      const opcionesDetectadas = extraerOpciones(pregunta);
+      
+      let movimientos = [];
 
+      if (opcionesDetectadas) {
+        const [op1, op2] = opcionesDetectadas;
+        
+        movimientos = [
+          { 
+            tipo: 'Vórtice Circular Horario (Alineación Absoluta)', 
+            dictamen: {
+              veredicto: `INCLINACIÓN ENERGÉTICA: ${op1.toUpperCase()}`,
+              revelacion: `El péndulo dibuja un círculo perfecto de luz sobre la frecuencia de ${op1}. Los astros y las corrientes del destino se concentran con gran magnetismo sobre esta opción, disipando cualquier rastro de duda en el tejido del tiempo.`,
+              consejo: `El cosmos habla con claridad para ti, ${nombre}. El camino de ${op1} posee la fuerza y la alineación vibratoria para manifestarse con éxito en tu realidad.`
+            }
+          },
+          { 
+            tipo: 'Vórtice Circular Antihorario (Alineación Absoluta)', 
+            dictamen: {
+              veredicto: `INCLINACIÓN ENERGÉTICA: ${op2.toUpperCase()}`,
+              revelacion: `El péndulo rompe la inercia y gira con fuerza liberadora hacia el campo magnético de ${op2}. La geometría sagrada del universo rechaza las alternativas y concentra toda la energía de realización en este sendero específico.`,
+              consejo: `Presta atención a las señales, ${nombre}. El flujo cósmico decreta que la vibración de ${op2} es la que contiene la llave evolutiva para resolver tu encrucijada.`
+            }
+          },
+          { 
+            tipo: 'Oscilación Lineal Vertical (Portal de Transición)', 
+            dictamen: {
+              veredicto: 'DILEMA ABIERTO — FUERZAS EQUILIBRADAS',
+              revelacion: `El péndulo traza una línea perfecta que oscila de arriba a abajo, negándose a elegir directamente entre ${op1} y ${op2}. Indica que ambas opciones poseen un peso energético idéntico en este instante y están en una balanza cósmica perfecta.`,
+              consejo: `La moneda está en el aire, ${nombre}. Las estrellas no quieren imponer un destino cerrado; la balanza se inclinará según las voluntades y las acciones humanas de los próximos días.`
+            }
+          }
+        ];
+      } else {
+        // Respuestas generales de respaldo si la pregunta NO tiene un "o" explícito
+        movimientos = [
+          { 
+            tipo: 'Vórtice Circular Horario (Alineación de Luz)', 
+            dictamen: {
+              veredicto: 'SÍ CLARO Y EVOLUTIVO',
+              revelacion: 'El péndulo dibuja la geometría sagrada del éxito. Las corrientes universales y las frecuencias planetarias se han alineado en perfecta sincronía con tu vibración. No hay obstáculos ocultos en este sendero.',
+              consejo: 'Avanza con absoluta certeza y firmeza. Las fuerzas de la creación respaldan tu intención; confía en el flujo de la abundancia.'
+            }
+          },
+          { 
+            tipo: 'Vórtice Circular Antihorario (Bloqueo de Energía)', 
+            dictamen: {
+              veredicto: 'NO ROTUNDO Y ADVERTENCIA ASTRAL',
+              revelacion: 'El péndulo gira en oposición al tejido del tiempo, detectando una densidad severa o interferencias en el entorno. Insistir en este propósito implica desgastar tu campo áurico.',
+              consejo: 'Detén el impulso, repliega tus intenciones y protege tu energía. El cosmos te está resguardando de un desvío innecesario; reevalúa la situación.'
+            }
+          }
+        ];
+      }
+
+      // Selección aleatoria dentro del contexto de la pregunta
       const azar = movimientos[Math.floor(Math.random() * movimientos.length)];
       
       setTipoMovimiento(azar.tipo);
@@ -66,7 +125,6 @@ export default function App() {
     setPregunta('');
     setResultado(null);
     setTipoMovimiento('');
-    // Devolvemos la pantalla arriba suavemente al formulario
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -156,7 +214,7 @@ export default function App() {
               value={pregunta}
               onChange={(e) => setPregunta(e.target.value)}
               disabled={estaConsultando}
-              placeholder="¿Es conveniente hacer esta inversión en este momento?..."
+              placeholder="¿Quien quedara de presidente en colombia: Abelardo o cepeda?..."
               className="w-full bg-black border border-zinc-700 rounded-xl px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all disabled:opacity-50 resize-none"
               required
             />
@@ -194,27 +252,39 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN DE LA RESPUESTA PERSONALIZADA Y COMPLETA */}
+        {/* SECCIÓN DE LA RESPUESTA INTELIGENTE DE OPCIONES */}
         {resultado && (
           <div 
             ref={respuestaRef}
-            className="w-full bg-gradient-to-b from-zinc-900 to-black border border-purple-500/30 rounded-2xl p-6 text-center shadow-2xl shadow-purple-950/20 space-y-4"
+            className="w-full bg-gradient-to-b from-zinc-900 to-black border border-purple-500/30 rounded-2xl p-6 text-center shadow-2xl shadow-purple-950/20 space-y-4 animate-[fadeIn_0.6s_ease-out]"
           >
             <div className="inline-block px-3 py-1 bg-purple-950/50 border border-purple-500/20 rounded-full text-[9px] uppercase font-bold tracking-widest text-purple-400">
-              Lectura para {nombre} ({signo})
+              Lectura Personalizada para {nombre} ({signo})
             </div>
             
             <div>
-              <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Movimiento Detectado:</div>
+              <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Fluctuación Radiestésica:</div>
               <div className="text-sm font-bold text-pink-400 tracking-wide">{tipoMovimiento}</div>
             </div>
             
             <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent my-1"></div>
             
-            <div>
-              <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Dictamen Astral:</div>
-              <div className="text-base md:text-lg font-medium text-emerald-400 leading-relaxed max-w-sm mx-auto">
-                {resultado}
+            <div className="text-left space-y-3 bg-black/40 p-4 rounded-xl border border-zinc-800/60">
+              <div>
+                <div className="text-green-400 text-[11px] font-bold uppercase tracking-wider mb-1">⚡ Dictamen Astral:</div>
+                <div className="text-white text-sm font-extrabold tracking-wide mb-1 text-center bg-zinc-900/50 py-1.5 rounded border border-zinc-800">
+                  {resultado.veredicto}
+                </div>
+                <p className="text-zinc-300 text-xs leading-relaxed font-light mt-2">
+                  {resultado.revelacion}
+                </p>
+              </div>
+              
+              <div className="pt-2 border-t border-zinc-900">
+                <div className="text-purple-400 text-[11px] font-bold uppercase tracking-wider mb-1">🔮 Guía del Cosmos:</div>
+                <p className="text-zinc-400 text-xs leading-relaxed italic">
+                  "{resultado.consejo}"
+                </p>
               </div>
             </div>
 
