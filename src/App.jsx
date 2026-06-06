@@ -12,25 +12,20 @@ export default function App() {
   // Referencias para controlar el desplazamiento de la pantalla
   const penduloRef = useRef(null);
   const respuestaRef = useRef(null);
+  
+  // Referencia invisible para el control del audio místico
+  const audioRef = useRef(null);
 
-  // NUEVO MOTOR DE EXTRACCIÓN BLINDADO
+  // Motor de extracción inteligente para preguntas binarias
   const extraerOpcionesInteligente = (texto) => {
-    // 1. Limpiamos signos de interrogación, exclamación y puntos
     let limpio = texto.replace(/[¿?¡!.]/g, '');
-    
-    // 2. Si el usuario usó dos puntos ":", tomamos solo lo que está después de los dos puntos
     if (limpio.includes(':')) {
       limpio = limpio.split(':').pop();
     }
-    
-    // 3. Separamos la frase buscando la letra "o" o "O" que tenga espacios a los lados
     const partes = limpio.split(/\s+[oO]\s+/);
-    
     if (partes.length >= 2) {
-      // Limpiamos espacios sobrantes de las dos opciones resultantes
       const opcion1 = partes[partes.length - 2].trim();
       const opcion2 = partes[partes.length - 1].trim();
-      
       if (opcion1 && opcion2) {
         return [opcion1, opcion2];
       }
@@ -46,21 +41,31 @@ export default function App() {
     setResultado(null);
     setTipoMovimiento('');
 
-    // Desplazar suavemente hacia el péndulo cuando empieza a moverse
+    // AUDIO UX: Reproducir el sonido del cuenco tibetano al iniciar la oscilación
+    try {
+      if (!audioRef.current) {
+        // Enlace público y ligero a una frecuencia de cuenco tibetano meditativo
+        audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');
+        audioRef.current.volume = 0.6; // Volumen moderado y envolvente
+      }
+      audioRef.current.currentTime = 0; // Reiniciar el sonido desde el segundo cero
+      audioRef.current.play();
+    } catch (error) {
+      console.log("El navegador bloqueó temporalmente el audio hasta interacción.", error);
+    }
+
+    // Desplazar suavemente hacia el péndulo animado
     setTimeout(() => {
       penduloRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 
-    // Conexión mística (3.5 segundos de oscilación)
+    // Conexión mística (3.5 segundos de oscilación con sonido de ambiente)
     setTimeout(() => {
-      // Ejecutamos el extractor blindado
       const opcionesDetectadas = extraerOpcionesInteligente(pregunta);
-      
       let movimientos = [];
 
       if (opcionesDetectadas) {
         const [op1, op2] = opcionesDetectadas;
-        
         movimientos = [
           { 
             tipo: 'Vórtice Circular Horario (Alineación Absoluta)', 
@@ -80,7 +85,6 @@ export default function App() {
           }
         ];
       } else {
-        // Respuestas generales simplificadas solo si NO se detectan dos opciones con la letra "o"
         movimientos = [
           { 
             tipo: 'Vórtice Circular Horario (Alineación de Luz)', 
@@ -93,14 +97,19 @@ export default function App() {
         ];
       }
 
-      // Selección aleatoria dentro del contexto correcto
       const azar = movimientos[Math.floor(Math.random() * movimientos.length)];
       
       setTipoMovimiento(azar.tipo);
       setResultado(azar.dictamen);
       setEstaConsultando(false);
 
-      // Desplazar suavemente hacia la respuesta final cuando aparece
+      // AUDIO UX: Detener el sonido sutilmente o dejar que la reverberación se apague
+      // En este caso lo pausamos suavemente para dar paso al silencio del dictamen
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      // Desplazar hacia el veredicto final
       setTimeout(() => {
         respuestaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 200);
@@ -212,7 +221,7 @@ export default function App() {
             disabled={estaConsultando || !pregunta.trim() || !nombre.trim() || !signo}
             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-900/30 transition-all transform active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
           >
-            {estaConsultando ? 'Conectando con tu energía...' : 'Consultar el Péndulo'}
+            {estaConsultando ? 'Canalizando vibraciones cósmicas...' : 'Consultar el Péndulo'}
           </button>
         </form>
       </main>
@@ -227,7 +236,7 @@ export default function App() {
               </div>
             </div>
             <p className="text-zinc-500 text-[10px] tracking-widest uppercase animate-pulse">
-              Canalizando vibración de {nombre} ({signo})...
+              Escuchando el murmullo de las estrellas para {nombre}...
             </p>
           </div>
         )}
@@ -235,18 +244,18 @@ export default function App() {
         {!estaConsultando && !resultado && (
           <div className="text-center p-6 border border-dashed border-zinc-800 rounded-2xl text-zinc-600 max-w-xs">
             <span className="text-2xl block mb-1">✨</span>
-            <p className="text-xs">El péndulo permanece inmóvil esperando tu vibración.</p>
+            <p className="text-xs">El péndulo permanece en silencio magnético esperando tu vibración.</p>
           </div>
         )}
 
-        {/* RESPUESTA PERSONALIZADA ASIGNANDO LAS OPCIONES REALES */}
+        {/* SECCIÓN DE LA RESPUESTA PERSONALIZADA E INTELIGENTE */}
         {resultado && (
           <div 
             ref={respuestaRef}
             className="w-full bg-gradient-to-b from-zinc-900 to-black border border-purple-500/30 rounded-2xl p-6 text-center shadow-2xl shadow-purple-950/20 space-y-4 animate-[fadeIn_0.6s_ease-out]"
           >
             <div className="inline-block px-3 py-1 bg-purple-950/50 border border-purple-500/20 rounded-full text-[9px] uppercase font-bold tracking-widest text-purple-400">
-              Lectura Personalizada para {nombre} ({signo})
+              Lectura Sagrada para {nombre} ({signo})
             </div>
             
             <div>
