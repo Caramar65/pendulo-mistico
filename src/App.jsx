@@ -13,21 +13,25 @@ export default function App() {
   const penduloRef = useRef(null);
   const respuestaRef = useRef(null);
 
-  // Función interna para extraer opciones separadas por la letra "o" o "O"
-  const extraerOpciones = (texto) => {
-    // Limpiamos signos de interrogación comunes al final
-    const textoLimpio = texto.replace(/[¿?]/g, '').trim();
+  // NUEVO MOTOR DE EXTRACCIÓN BLINDADO
+  const extraerOpcionesInteligente = (texto) => {
+    // 1. Limpiamos signos de interrogación, exclamación y puntos
+    let limpio = texto.replace(/[¿?¡!.]/g, '');
     
-    // Buscamos patrones como "Abelardo o Cepeda" o "A o B" usando expresiones regulares
-    const partes = textoLimpio.split(/\s+[oO]\s+/);
+    // 2. Si el usuario usó dos puntos ":", tomamos solo lo que está después de los dos puntos
+    if (limpio.includes(':')) {
+      limpio = limpio.split(':').pop();
+    }
+    
+    // 3. Separamos la frase buscando la letra "o" o "O" que tenga espacios a los lados
+    const partes = limpio.split(/\s+[oO]\s+/);
     
     if (partes.length >= 2) {
-      // Tomamos la última palabra o frase antes del "o" y la primera después del "o"
-      const opcion1 = partes[partes.length - 2].split(/[:\s]/).pop().trim();
+      // Limpiamos espacios sobrantes de las dos opciones resultantes
+      const opcion1 = partes[partes.length - 2].trim();
       const opcion2 = partes[partes.length - 1].trim();
       
-      // Validamos que no estén vacías y tengan una longitud razonable
-      if (opcion1 && opcion2 && opcion1.length < 30 && opcion2.length < 30) {
+      if (opcion1 && opcion2) {
         return [opcion1, opcion2];
       }
     }
@@ -49,8 +53,8 @@ export default function App() {
 
     // Conexión mística (3.5 segundos de oscilación)
     setTimeout(() => {
-      // Analizamos si la pregunta contiene opciones binarias (Ej: Abelardo o Cepeda)
-      const opcionesDetectadas = extraerOpciones(pregunta);
+      // Ejecutamos el extractor blindado
+      const opcionesDetectadas = extraerOpcionesInteligente(pregunta);
       
       let movimientos = [];
 
@@ -71,41 +75,25 @@ export default function App() {
             dictamen: {
               veredicto: `INCLINACIÓN ENERGÉTICA: ${op2.toUpperCase()}`,
               revelacion: `El péndulo rompe la inercia y gira con fuerza liberadora hacia el campo magnético de ${op2}. La geometría sagrada del universo rechaza las alternativas y concentra toda la energía de realización en este sendero específico.`,
-              consejo: `Presta atención a las señales, ${nombre}. El flujo cósmico decreta que la vibración de ${op2} es la que contiene la llave evolutiva para resolver tu encrucijada.`
-            }
-          },
-          { 
-            tipo: 'Oscilación Lineal Vertical (Portal de Transición)', 
-            dictamen: {
-              veredicto: 'DILEMA ABIERTO — FUERZAS EQUILIBRADAS',
-              revelacion: `El péndulo traza una línea perfecta que oscila de arriba a abajo, negándose a elegir directamente entre ${op1} y ${op2}. Indica que ambas opciones poseen un peso energético idéntico en este instante y están en una balanza cósmica perfecta.`,
-              consejo: `La moneda está en el aire, ${nombre}. Las estrellas no quieren imponer un destino cerrado; la balanza se inclinará según las voluntades y las acciones humanas de los próximos días.`
+              consejo: `Presta atención a las señales, ${nombre}. El flujo cósmico decreta que la vibración de ${op2} es la que contiene la llave de la manifestación.`
             }
           }
         ];
       } else {
-        // Respuestas generales de respaldo si la pregunta NO tiene un "o" explícito
+        // Respuestas generales simplificadas solo si NO se detectan dos opciones con la letra "o"
         movimientos = [
           { 
             tipo: 'Vórtice Circular Horario (Alineación de Luz)', 
             dictamen: {
               veredicto: 'SÍ CLARO Y EVOLUTIVO',
-              revelacion: 'El péndulo dibuja la geometría sagrada del éxito. Las corrientes universales y las frecuencias planetarias se han alineado en perfecta sincronía con tu vibración. No hay obstáculos ocultos en este sendero.',
-              consejo: 'Avanza con absoluta certeza y firmeza. Las fuerzas de la creación respaldan tu intención; confía en el flujo de la abundancia.'
-            }
-          },
-          { 
-            tipo: 'Vórtice Circular Antihorario (Bloqueo de Energía)', 
-            dictamen: {
-              veredicto: 'NO ROTUNDO Y ADVERTENCIA ASTRAL',
-              revelacion: 'El péndulo gira en oposición al tejido del tiempo, detectando una densidad severa o interferencias en el entorno. Insistir en este propósito implica desgastar tu campo áurico.',
-              consejo: 'Detén el impulso, repliega tus intenciones y protege tu energía. El cosmos te está resguardando de un desvío innecesario; reevalúa la situación.'
+              revelacion: 'El péndulo dibuja la geometría sagrada del éxito. Las corrientes universales se han alineado en perfecta sincronía con tu vibración.',
+              consejo: 'Avanza con absoluta certeza y firmeza. Las fuerzas cósmicas respaldan tu intención.'
             }
           }
         ];
       }
 
-      // Selección aleatoria dentro del contexto de la pregunta
+      // Selección aleatoria dentro del contexto correcto
       const azar = movimientos[Math.floor(Math.random() * movimientos.length)];
       
       setTipoMovimiento(azar.tipo);
@@ -120,7 +108,6 @@ export default function App() {
     }, 3500);
   };
 
-  // Función para reiniciar por completo la consulta mística
   const reiniciarConsulta = () => {
     setPregunta('');
     setResultado(null);
@@ -144,7 +131,7 @@ export default function App() {
       <main className="w-full max-w-lg bg-zinc-900/80 border border-zinc-800 rounded-2xl p-6 shadow-2xl backdrop-blur-sm mb-8">
         <form onSubmit={manejarConsulta} className="space-y-4">
           
-          {/* Fila: Nombre */}
+          {/* Nombre */}
           <div>
             <label className="block text-[10px] font-semibold text-purple-400 uppercase tracking-widest mb-1">
               Tu Nombre
@@ -160,7 +147,7 @@ export default function App() {
             />
           </div>
 
-          {/* Fila: Signo y Edad */}
+          {/* Signo y Edad */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[10px] font-semibold text-purple-400 uppercase tracking-widest mb-1">
@@ -204,7 +191,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Fila: Pregunta */}
+          {/* Pregunta */}
           <div>
             <label className="block text-[10px] font-semibold text-purple-400 uppercase tracking-widest mb-1">
               Haz tu pregunta de manera clara
@@ -252,7 +239,7 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN DE LA RESPUESTA INTELIGENTE DE OPCIONES */}
+        {/* RESPUESTA PERSONALIZADA ASIGNANDO LAS OPCIONES REALES */}
         {resultado && (
           <div 
             ref={respuestaRef}
@@ -272,7 +259,7 @@ export default function App() {
             <div className="text-left space-y-3 bg-black/40 p-4 rounded-xl border border-zinc-800/60">
               <div>
                 <div className="text-green-400 text-[11px] font-bold uppercase tracking-wider mb-1">⚡ Dictamen Astral:</div>
-                <div className="text-white text-sm font-extrabold tracking-wide mb-1 text-center bg-zinc-900/50 py-1.5 rounded border border-zinc-800">
+                <div className="text-white text-sm font-extrabold tracking-wide mb-1 text-center bg-zinc-900/50 py-1.5 rounded border border-zinc-800 px-2">
                   {resultado.veredicto}
                 </div>
                 <p className="text-zinc-300 text-xs leading-relaxed font-light mt-2">
