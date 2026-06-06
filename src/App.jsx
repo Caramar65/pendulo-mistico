@@ -29,10 +29,22 @@ export default function App() {
     // Conexión mística (3.5 segundos de oscilación)
     setTimeout(() => {
       const movimientos = [
-        { tipo: 'Circular en sentido horario', dictamen: 'SÍ. Las energías están alineadas a tu favor.' },
-        { tipo: 'Circular en sentido antihorario', dictamen: 'NO. Hay bloqueos en este camino, reevalúa tus opciones.' },
-        { tipo: 'Oscilación Lineal Vertical', dictamen: 'PROBABLE. El cosmos te abre la puerta, pero la decisión final es tuya.' },
-        { tipo: 'Oscilación Lineal Horizontal', dictamen: 'DUDOSO. Fuerzas en conflicto en este momento, pregunta más tarde.' }
+        { 
+          tipo: 'Circular en sentido horario', 
+          dictamen: 'SÍ CLARO Y AFIRMATIVO. Las fuerzas cósmicas indican un camino despejado, lleno de armonía y éxito para tu propósito. Avanza con absoluta confianza.' 
+        },
+        { 
+          tipo: 'Circular en sentido antihorario', 
+          dictamen: 'NO ROTUNDO Y ADVERTENCIA. Existen bloqueos densos o energías en oposición en este camino. El cosmos te sugiere detenerte, proteger tu energía y reevaluar la situación por completo.' 
+        },
+        { 
+          tipo: 'Oscilación Lineal Vertical', 
+          dictamen: 'PROBABLE Y EVOLUTIVO. La puerta está abierta y el flujo energético es favorable, pero el resultado final dependerá estrictamente de tu determinación y de las acciones que tomes hoy.' 
+        },
+        { 
+          tipo: 'Oscilación Lineal Horizontal', 
+          dictamen: 'DUDOSO E INCIERTO. Hay fuerzas en conflicto y confusión en el entorno astral en este momento. El panorama no está claro; la recomendación es serenar la mente y consultar más tarde.' 
+        }
       ];
 
       const azar = movimientos[Math.floor(Math.random() * movimientos.length)];
@@ -47,6 +59,15 @@ export default function App() {
       }, 200);
 
     }, 3500);
+  };
+
+  // Función para reiniciar por completo la consulta mística
+  const reiniciarConsulta = () => {
+    setPregunta('');
+    setResultado(null);
+    setTipoMovimiento('');
+    // Devolvemos la pantalla arriba suavemente al formulario
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -94,7 +115,7 @@ export default function App() {
                 className="w-full bg-black border border-zinc-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all disabled:opacity-50"
                 required
               >
-                <option value="" disabled text-zinc-600>Selecciona</option>
+                <option value="" disabled>Selecciona</option>
                 <option value="Aries">Aries</option>
                 <option value="Tauro">Tauro</option>
                 <option value="Géminis">Géminis</option>
@@ -173,23 +194,37 @@ export default function App() {
           </div>
         )}
 
-        {/* SECCIÓN DE LA RESPUESTA PERSONALIZADA */}
+        {/* SECCIÓN DE LA RESPUESTA PERSONALIZADA Y COMPLETA */}
         {resultado && (
           <div 
             ref={respuestaRef}
-            className="w-full bg-gradient-to-b from-zinc-900 to-black border border-purple-500/30 rounded-2xl p-6 text-center shadow-2xl shadow-purple-950/20"
+            className="w-full bg-gradient-to-b from-zinc-900 to-black border border-purple-500/30 rounded-2xl p-6 text-center shadow-2xl shadow-purple-950/20 space-y-4"
           >
-            <div className="inline-block px-3 py-1 bg-purple-950/50 border border-purple-500/20 rounded-full text-[9px] uppercase font-bold tracking-widest text-purple-400 mb-3">
+            <div className="inline-block px-3 py-1 bg-purple-950/50 border border-purple-500/20 rounded-full text-[9px] uppercase font-bold tracking-widest text-purple-400">
               Lectura para {nombre} ({signo})
             </div>
-            <div className="text-zinc-500 text-[10px] mb-0.5 uppercase tracking-wider">Movimiento Detectado:</div>
-            <div className="text-sm font-bold text-pink-400 mb-3 tracking-wide">{tipoMovimiento}</div>
             
-            <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent my-3"></div>
+            <div>
+              <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Movimiento Detectado:</div>
+              <div className="text-sm font-bold text-pink-400 tracking-wide">{tipoMovimiento}</div>
+            </div>
             
-            <div className="text-zinc-500 text-[10px] mb-1 uppercase tracking-wider">Dictamen Astral:</div>
-            <div className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 tracking-wide drop-shadow">
-              {resultado}
+            <div className="h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent my-1"></div>
+            
+            <div>
+              <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-1">Dictamen Astral:</div>
+              <div className="text-base md:text-lg font-medium text-emerald-400 leading-relaxed max-w-sm mx-auto">
+                {resultado}
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={reiniciarConsulta}
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold py-2.5 px-4 rounded-xl border border-zinc-700 transition-all active:scale-95"
+              >
+                Nueva consulta energética
+              </button>
             </div>
           </div>
         )}
